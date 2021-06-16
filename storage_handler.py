@@ -36,7 +36,7 @@ class BaseTimeseriesStorage:
             os.mkdir(self.storage_dir)
 
         pystore.set_path(self.storage_dir)
-        self.store = pystore.store(STORAGE_NAME)
+        self.store = pystore.store(name)
         self.collections = self.store.list_collections()
         self.set_collection(collection)
 
