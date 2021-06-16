@@ -15,7 +15,7 @@ from intervals import INTERVAL_S
 
 load_dotenv()
 SHARED_DIRECTORY = os.getenv('SHARED_DIRECTORY')
-# LOCAL_DIRECTORY = os.getenv('LOCAL_DIRECTORY')
+LOCAL_DIRECTORY = os.getenv('LOCAL_DIRECTORY')
 STORAGE_DIRECTORY = os.getenv('STORAGE_DIRECTORY')
 STORAGE_NAME = os.getenv('STORAGE_NAME')
 
@@ -116,6 +116,6 @@ class SharedStorage(BaseTimeseriesStorage):
         super().__init__(name, SHARED_DIRECTORY, collection)
 
 
-# class LocalStorage(BaseTimeseriesStorage):
-#     def __init__(self, name=STORAGE_NAME, collection='Crypto.Candles.Day'):
-#         super().__init__(name, LOCAL_DIRECTORY, collection)
+class LocalStorage(BaseTimeseriesStorage):
+    def __init__(self, name=STORAGE_NAME, collection='Crypto.Candles.Day'):
+        super().__init__(name, LOCAL_DIRECTORY, collection)
