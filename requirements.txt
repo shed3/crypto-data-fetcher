@@ -2,44 +2,59 @@ aiodns==2.0.0
 aiohttp==3.7.4.post0
 async-timeout==3.0.1
 attrs==21.2.0
+bokeh @ file:///Users/runner/miniforge3/conda-bld/bokeh_1620738405721/work
 ccxt==1.50.88
 certifi==2021.5.30
 cffi==1.14.5
 chardet==4.0.0
-click==8.0.1
-cloudpickle==1.6.0
+click @ file:///Users/runner/miniforge3/conda-bld/click_1621503759047/work
+cloudpickle @ file:///home/conda/feedstock_root/build_artifacts/cloudpickle_1598400192773/work
 cramjam==2.3.2
 cryptography==3.4.7
-dask==2021.5.1
-distributed==2021.5.1
+cytoolz==0.11.0
+dask @ file:///home/conda/feedstock_root/build_artifacts/dask-core_1622841223487/work
+distributed @ file:///Users/runner/miniforge3/conda-bld/distributed_1622867551827/work
 fastparquet==0.6.3
-fsspec==2021.5.0
+flake8 @ file:///tmp/build/80754af9/flake8_1620776156532/work
+fsspec @ file:///home/conda/feedstock_root/build_artifacts/fsspec_1621008914210/work
 HeapDict==1.0.1
 idna==2.10
+importlib-metadata @ file:///Users/runner/miniforge3/conda-bld/importlib-metadata_1622775543057/work
+Jinja2 @ file:///home/conda/feedstock_root/build_artifacts/jinja2_1621419064915/work
 locket==0.2.1
-msgpack==1.0.2
+MarkupSafe @ file:///Users/runner/miniforge3/conda-bld/markupsafe_1621455730621/work
+mccabe==0.6.1
+messari==1.0.0
+msgpack @ file:///Users/runner/miniforge3/conda-bld/msgpack-python_1610121729707/work
 multidict==5.1.0
 multitasking==0.0.9
-numpy==1.20.3
+numpy @ file:///Users/runner/miniforge3/conda-bld/numpy_1622014634298/work
+olefile @ file:///home/conda/feedstock_root/build_artifacts/olefile_1602866521163/work
+packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1612459636436/work
 pandas==1.2.4
-partd==1.2.0
-psutil==5.8.0
+partd @ file:///home/conda/feedstock_root/build_artifacts/partd_1617910651905/work
+Pillow @ file:///Users/runner/miniforge3/conda-bld/pillow_1621288026676/work
+psutil @ file:///Users/runner/miniforge3/conda-bld/psutil_1618863837648/work
 pycares==4.0.0
+pycodestyle @ file:///home/conda/feedstock_root/build_artifacts/pycodestyle_1615833610040/work
 pycparser==2.20
+pyflakes @ file:///home/conda/feedstock_root/build_artifacts/pyflakes_1616623675904/work
+pyparsing==2.4.7
 PyStore==0.1.22
 python-dateutil==2.8.1
 python-dotenv==0.17.1
-python-snappy==0.6.0
-pytz==2021.1
+python-snappy @ file:///opt/concourse/worker/volumes/live/85e56842-5d01-472f-47d9-9a76fa267019/volume/python-snappy_1610133348440/work
+pytz @ file:///home/conda/feedstock_root/build_artifacts/pytz_1612179539967/work
 PyYAML==5.4.1
 requests==2.25.1
-six==1.16.0
-sortedcontainers==2.4.0
-tblib==1.7.0
+six @ file:///home/conda/feedstock_root/build_artifacts/six_1620240208055/work
+sortedcontainers @ file:///home/conda/feedstock_root/build_artifacts/sortedcontainers_1621217038088/work
+tblib @ file:///home/conda/feedstock_root/build_artifacts/tblib_1616261298899/work
 thrift==0.13.0
-toolz==0.11.1
-tornado==6.1
-typing-extensions==3.10.0.0
+toolz @ file:///home/conda/feedstock_root/build_artifacts/toolz_1600973991856/work
+tornado @ file:///Users/runner/miniforge3/conda-bld/tornado_1610094711612/work
+typing-extensions @ file:///home/conda/feedstock_root/build_artifacts/typing_extensions_1622748266870/work
 urllib3==1.26.5
 yarl==1.6.3
 zict==2.0.0
+zipp @ file:///home/conda/feedstock_root/build_artifacts/zipp_1614945704755/work
