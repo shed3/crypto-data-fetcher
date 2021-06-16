@@ -116,6 +116,6 @@ class SharedStorage(BaseTimeseriesStorage):
         super().__init__(name, SHARED_DIRECTORY, collection)
 
 
-class LocalStorage(BaseTimeseriesStorage):
-    def __init__(self, name=STORAGE_NAME, collection='Crypto.Candles.Day'):
-        super().__init__(name, LOCAL_DIRECTORY, collection)
+# class LocalStorage(BaseTimeseriesStorage):
+#     def __init__(self, name=STORAGE_NAME, collection='Crypto.Candles.Day'):
+#         super().__init__(name, LOCAL_DIRECTORY, collection)
