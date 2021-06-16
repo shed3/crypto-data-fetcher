@@ -124,7 +124,7 @@ def create_df(data, schema):
     return df
 
 
-def fetch_all_candles(exchange, symbol, interval, limit, start_key, end_key, is_seconds=True, before=None):
+def fetch_all_candles(exchange, symbol, interval, limit, start_key, end_key, metric, is_seconds=True, before=None):
     minute_candles = []
     if exchange == "kucoin":
         handler = DataHandler("ccxt", start_key, end_key)
@@ -145,7 +145,7 @@ def fetch_all_candles(exchange, symbol, interval, limit, start_key, end_key, is_
         }
         minute_candles = handler.fetchAvailableHistory(
             messari.get_asset_timeseries,
-            [symbol, 'price'],
+            [symbol, metric],
             query_params,
             interval,
             limit=limit,
@@ -154,11 +154,11 @@ def fetch_all_candles(exchange, symbol, interval, limit, start_key, end_key, is_
     return create_df(minute_candles["data"], minute_candles["schema"])
 
 
-def write_all_candles(store, source, symbols, interval, startKey, endKey, overwrite=False):
+def write_all_candles(store, source, symbols, interval, startKey, endKey, metric, overwrite=False):
     for symbol in symbols:
         if not store.item_exists(symbol):
             print("Fetching {}...".format(symbol))
-            candles = fetch_all_candles(source, symbol, interval, max_data_points_per_req, startKey, endKey)
+            candles = fetch_all_candles(source, symbol, interval, max_data_points_per_req, startKey, endKey, metric)
             if len(candles) > 1:
                 # check for gaps to report
                 store.write(symbol, candles, metadata={'source': source, 'interval': interval})
@@ -178,13 +178,13 @@ def write_all_candles(store, source, symbols, interval, startKey, endKey, overwr
 
                 # add any data that exists before metadata._first_record
                 inital_candle_check = fetch_all_candles(
-                    source, symbol, interval, 100, startKey, endKey, before=metadata["_last_record"])
+                    source, symbol, interval, 100, startKey, endKey, metric, before=metadata["_last_record"])
                 if(len(inital_candle_check) > 0):
                     print("Appending old entries for {}...".format(symbol))
                     store.append(symbol, inital_candle_check)
 
                 current_candle_check = fetch_all_candles(
-                    source, symbol, interval, 100, startKey, endKey, since=metadata["_first_record"])
+                    source, symbol, interval, 100, startKey, endKey, metric, since=metadata["_first_record"])
                 if(len(current_candle_check) > 0):
                     print("Appending new entries for {}...".format(symbol))
                     store.append(symbol, current_candle_check)
