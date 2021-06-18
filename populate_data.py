@@ -157,7 +157,7 @@ def fetch_all_candles(exchange, symbol, interval, limit, start_key, end_key, met
 def write_all_candles(store, source, symbols, interval, startKey, endKey, metric, overwrite=False):
     for symbol in symbols:
         if not store.item_exists(symbol):
-            print("Fetching {}...".format(symbol))
+            print("Fetching {}-{}...".format(symbol, metric))
             candles = fetch_all_candles(source, symbol, interval, max_data_points_per_req, startKey, endKey, metric)
             if len(candles) > 1:
                 # check for gaps to report
