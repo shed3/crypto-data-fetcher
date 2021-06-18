@@ -31,6 +31,6 @@ for metric in all_metrics:
     # local_store = LocalStorage(data_source, collection)
     shared_store = SharedStorage(data_source, collection)
     store = shared_store
-    write_all_candles(store, data_source, ['BTC', 'ETH', 'LINK', 'ADA', 'DOT', 'LTC'], "1d", "start", "end", metric, True)
+    write_all_candles(store, data_source, symbols[0:100], "1d", "start", "end", metric, True)
 
 
