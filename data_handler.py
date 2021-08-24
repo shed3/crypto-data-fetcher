@@ -26,7 +26,7 @@ class DataHandler:
         self.end_key = end_key      # end key for target historical requests
         self.max_request_attempts = max_request_attempts      # end key for target historical requests
 
-    def get_timeframe(self, interval, size, before=None, after=None, is_seconds=True):
+    def get_timeframe(self, interval, size, before=None, after=None, is_seconds=True, direction="backward"):
         if before:
             start = datetime.strptime(before, "%Y-%m-%d %H:%M:%S.%f")
         elif after:
@@ -34,7 +34,7 @@ class DataHandler:
         else:
             start = datetime.now()
 
-        timeframe = Timeframe(interval, size, start, is_seconds)
+        timeframe = Timeframe(interval, size, start, direction, is_seconds)
         timeframe.prev()    # go to prev timeframe so start is the end of new timeframe
         return timeframe
 
@@ -66,7 +66,10 @@ class DataHandler:
         request_retries_left = self.max_request_attempts
         period_skips_left = self.max_request_attempts
         all_data = []
-        timeframe = self.get_timeframe(interval, limit, before, after, is_seconds)
+
+        # create time frame at determine which direction to move in
+        timeframe_direction = 'forward' if not before and after else 'backward'
+        timeframe = self.get_timeframe(interval, limit, before, after, is_seconds, timeframe_direction)
         values_schema = []
         while True:
             error_code = None
@@ -75,7 +78,6 @@ class DataHandler:
             func_kwargs[self.end_key] = timeframe.end_timestamp_sec if is_seconds else timeframe.end_timestamp
             if self.source == "messari":
                 page = func(*func_args, **func_kwargs)
-                # print(page)
                 error_code = page["status"].get("error_code", None)
                 if error_code == 429:
                     sleep_time = re.findall('\d+', page["status"]["error_message"])
@@ -93,11 +95,11 @@ class DataHandler:
                 all_data = all_data + page
                 request_retries_left = self.max_request_attempts
                 period_skips_left = self.max_request_attempts
-                timeframe.prev()
+                timeframe.next()
             elif period_skips_left > 0:
                 # next itreation -> attempt to get data from previous period
                 period_skips_left -= 1
-                timeframe.prev()
+                timeframe.next()
             elif error_code == 429 and request_retries_left > 0:
                 # next itreation -> attempt to get data from same period
                 # TODO (change retry date strategy) -> reduce start and end time by a large interval (year, month, week) then work forward to first failure date
@@ -114,12 +116,13 @@ class DataHandler:
 
 
 class Timeframe:
-    def __init__(self, interval, size, start, use_seconds=False):
+    def __init__(self, interval, size, start, direction, use_seconds=False):
         self.interval = interval    # string representation of timeseries interval. Options are 1m, 5m, 15m, 30m, 1h, 4h, 6h, 12h, 1d
         self.size = size            # number of intervals per timeframe
         self.start_timestamp = start.timestamp() * 1000
         self.end_timestamp = self.start_timestamp + (INTERVAL_MS[self.interval] * self.size)
         self.use_seconds = use_seconds
+        self.direction = direction
 
     @property
     def start_timestamp_sec(self):
@@ -129,10 +132,26 @@ class Timeframe:
     def end_timestamp_sec(self):
         return int(self.end_timestamp / 1000)
 
+    def _move_backward(self):
+        # one interval before the current start time
+        self.end_timestamp = self.start_timestamp - INTERVAL_MS[self.interval]
+        # go back interval x size from end time to set prev time chunk
+        self.start_timestamp = self.end_timestamp - (INTERVAL_MS[self.interval] * self.size)
+
+    def _move_foreward(self):
+        # one interval after the current end time
+        self.start_timestamp = self.end_timestamp + INTERVAL_MS[self.interval]
+        # go forward interval x size from start time to set next time chunk
+        self.end_timestamp = self.start_timestamp + (INTERVAL_MS[self.interval] * self.size)
+
     def prev(self):
-        self.end_timestamp = self.start_timestamp - INTERVAL_MS[self.interval]                  # one interval before the current start time
-        self.start_timestamp = self.end_timestamp - (INTERVAL_MS[self.interval] * self.size)     # go back interval x size from end time to set prev time chunk
+        if self.direction == 'forward':
+            self._move_backward()
+        else:
+            self._move_foreward()
 
     def next(self):
-        self.start_timestamp = self.end_timestamp + INTERVAL_MS[self.interval]                   # one interval after the current end time
-        self.end_timestamp = self.start_timestamp + (INTERVAL_MS[self.interval] * self.size)     # go forward interval x size from start time to set next time chunk
+        if self.direction == 'forward':
+            self._move_foreward()
+        else:
+            self._move_backward()

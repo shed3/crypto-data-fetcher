@@ -88,27 +88,32 @@ class BaseTimeseriesStorage:
         last_record = datetime.strptime(existing_data.metadata["_last_record"], "%Y-%m-%d %H:%M:%S.%f")
 
         # get date range of new dataset
-        new_dataset_min = data.index.min
-        new_dataset_max = data.index.max
-
+        new_first_record = data.index.min()
+        new_last_record = data.index.max()
         # check for neccessary updates to item's metadata
         updated_metadata = existing_data.metadata.copy()
         metadata_was_updated = False
-        if new_dataset_min < first_record:
-            updated_metadata["_first_record"] = new_dataset_min.strftime("%Y-%m-%d %H:%M:%S.%f")
+        if new_first_record < first_record:
+            print("Updating first record to {}".format(new_first_record))
+            updated_metadata["_first_record"] = new_last_record.strftime("%Y-%m-%d %H:%M:%S.%f")
             metadata_was_updated = True
 
-        if new_dataset_max < last_record:
-            updated_metadata["_last_record"] = new_dataset_max.strftime("%Y-%m-%d %H:%M:%S.%f")
+        if last_record < new_last_record:
+            print("Updating last record to {}".format(new_last_record))
+            updated_metadata["_last_record"] = new_last_record.strftime("%Y-%m-%d %H:%M:%S.%f")
             metadata_was_updated = True
+        else:
+            print("Didnt update last record bc {} > {}".format(last_record, new_last_record))
 
         if len(data) > 0:
+            print("Updating total records to {}".format(len(data)))
             updated_metadata["_total_records"] = updated_metadata["_total_records"] + len(data)
             metadata_was_updated = True
 
         # update metadata if needed
         if metadata_was_updated:
-            pystore.utils.write_metadata(pystore.utils.make_path(self.store, self.current_collection, item), updated_metadata)
+            path = self.current_collection._item_path(item)
+            pystore.utils.write_metadata(path, {**updated_metadata})
 
 
 class SharedStorage(BaseTimeseriesStorage):

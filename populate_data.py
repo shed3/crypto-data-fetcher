@@ -115,16 +115,15 @@ def get_available_symbols():
 def create_df(data, schema):
     if len(data) < 1:
         return []
-    columns = {index: value for index, value in enumerate(schema)}
     df = pd.DataFrame(data)
-    df = df.rename(columns=columns)
+    df.columns = list(schema)
     df['timestamp'] = pd.to_datetime(df["timestamp"], unit="ms")
     df = df.set_index('timestamp')
     df.sort_index(inplace=True)
     return df
 
 
-def fetch_all_candles(exchange, symbol, interval, limit, start_key, end_key, is_seconds=True, before=None):
+def fetch_all_candles(exchange, symbol, interval, limit, start_key, end_key, is_seconds=True, before=None, after=None):
     minute_candles = []
     if exchange == "kucoin":
         handler = DataHandler("ccxt", start_key, end_key)
@@ -135,6 +134,7 @@ def fetch_all_candles(exchange, symbol, interval, limit, start_key, end_key, is_
             interval,
             limit=limit,
             before=before
+
         )
     elif exchange == "messari":
         handler = DataHandler("messari", start_key, end_key)
@@ -149,12 +149,14 @@ def fetch_all_candles(exchange, symbol, interval, limit, start_key, end_key, is_
             query_params,
             interval,
             limit=limit,
-            before=before
+            before=before,
+            after=after
         )
     return create_df(minute_candles["data"], minute_candles["schema"])
 
 
 def write_all_candles(store, source, symbols, interval, startKey, endKey, overwrite=False):
+    symbols = ['AMPL', 'ARMOR', 'BAL', 'BOND', 'BTC3L', 'CLV', 'ETH3L', 'MUSE', 'NU', 'OCEAN', 'OMG', 'REN', 'ROOK', 'SFI'] + symbols
     for symbol in symbols:
         if not store.item_exists(symbol):
             print("Fetching {}...".format(symbol))
@@ -170,21 +172,23 @@ def write_all_candles(store, source, symbols, interval, startKey, endKey, overwr
             # check if metadata._last_record is before current time
             item = store.read(symbol)
             metadata = item.metadata
-            mins_since_last_updated = (datetime.strptime(
-                metadata["_updated"], "%Y-%m-%d %H:%M:%S.%f") - datetime.now()).total_seconds() / 60
+            mins_since_last_updated = (datetime.now() - datetime.strptime(
+                metadata["_updated"], "%Y-%m-%d %H:%M:%S.%f")).total_seconds() / 60
             if(mins_since_last_updated > 60):
                 # fill gap from current time to metadata._last_record
                 print("Updating {} with most recent data...".format(symbol))
 
                 # add any data that exists before metadata._first_record
                 inital_candle_check = fetch_all_candles(
-                    source, symbol, interval, 100, startKey, endKey, before=metadata["_last_record"])
+                    source, symbol, interval, 100, startKey, endKey, before=metadata["_first_record"])
                 if(len(inital_candle_check) > 0):
                     print("Appending old entries for {}...".format(symbol))
                     store.append(symbol, inital_candle_check)
 
                 current_candle_check = fetch_all_candles(
-                    source, symbol, interval, 100, startKey, endKey, since=metadata["_first_record"])
+                    source, symbol, interval, 100, startKey, endKey, after=metadata["_last_record"])
                 if(len(current_candle_check) > 0):
                     print("Appending new entries for {}...".format(symbol))
                     store.append(symbol, current_candle_check)
+            else:
+                print("{} was last updated {} mins ago... skipping".format(symbol, mins_since_last_updated))
