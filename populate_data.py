@@ -156,7 +156,6 @@ def fetch_all_candles(exchange, symbol, interval, limit, start_key, end_key, is_
 
 
 def write_all_candles(store, source, symbols, interval, startKey, endKey, overwrite=False):
-    symbols = ['AMPL', 'ARMOR', 'BAL', 'BOND', 'BTC3L', 'CLV', 'ETH3L', 'MUSE', 'NU', 'OCEAN', 'OMG', 'REN', 'ROOK', 'SFI'] + symbols
     for symbol in symbols:
         if not store.item_exists(symbol):
             print("Fetching {}...".format(symbol))

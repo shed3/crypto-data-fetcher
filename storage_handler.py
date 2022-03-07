@@ -27,7 +27,7 @@ class BaseTimeseriesStorage:
         self.base_dir = os.path.abspath(base_dir)
         self.storage_dir = "{}/{}".format(self.base_dir, STORAGE_DIRECTORY)
 
-        # create base directory is it doesnt exist
+        # create base directory if it doesnt exist
         if not os.path.isdir(self.base_dir):
             os.mkdir(self.base_dir)
 
